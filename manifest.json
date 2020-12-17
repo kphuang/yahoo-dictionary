@@ -1,0 +1,25 @@
+{
+    "name": "Yahoo字典搜尋",
+    "version": "0.1",
+    "description": "免開新分頁也能用Yahoo字典搜尋查找英文單字",
+    "permissions": [
+        "https://tw.dictionary.search.yahoo.com/*"
+    ],
+    "browser_action": {
+        "default_popup": "html/popup.html",
+        "default_title": "Yahoo字典搜尋",
+        "default_icon": {
+            "16": "images/icon_16x16.png",
+            "32": "images/icon_32x32.png",
+            "48": "images/icon_48x48.png",
+            "128": "images/icon_128x128.png"
+        }
+    },
+    "icons": {
+        "16": "images/icon_16x16.png",
+        "32": "images/icon_32x32.png",
+        "48": "images/icon_48x48.png",
+        "128": "images/icon_128x128.png"
+    },
+    "manifest_version": 2
+}

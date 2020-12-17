@@ -1,0 +1,31 @@
+body {
+    min-width: 300px;
+}
+
+input {
+    border: 1px solid #7759ff;
+    min-width: 200px;
+}
+
+button {
+    border: none;
+    outline: none;
+    color: white;
+    background-color: #7759ff;
+}
+
+button:hover {
+    background-color: #7142f3;
+}
+
+button:active {
+    background-color: #6b2ce8;
+}
+
+p {
+    color: gray;
+}
+
+footer {
+    color: gray;
+}
