@@ -26,51 +26,6 @@ async function searchForWords(query)
     return await response.text();
 }
 
-function getSource(input)
-{
-    // live/f: female live/m: male
-    let url = 'https://s.yimg.com/bg/dict/dreye/live';
-    let src = '';
-
-    let sound = new Audio(`${url}/f/${input}.mp3`);
-    sound.muted = true;
-    sound.preload = 'none';
-    sound.play().then(_ => {
-        src = `${url}/f/${input}.mp3`;
-        console.log('promise f', src);
-    }).catch(error => {
-        console.log(error);
-    });
-
-    sound = new Audio(`${url}/m/${input}.mp3`);
-    sound.muted = true;
-    sound.preload = 'none';
-    sound.play().then(_ => {
-        src = `${url}/m/${input}.mp3`;
-        console.log('promise m', src);
-    }).catch(error => {
-        console.log(error);
-    });
-
-    return src;
-}
-
-// <audio controls src="https://s.yimg.com/bg/dict/dreye/live/[f|m]/[input].mp3" preload="none"></audio>
-function createAudio(input)
-{
-    let src = getSource(input);
-    if (src === '')
-        return null;
-
-    let e = document.createElement('audio');
-    e.id = 'audio';
-    e.type = 'audio/mpeg';
-    e.preload = 'none';
-    e.controls = true;
-    e.src = src;
-    return e;
-}
-
 // If there is pronunciation element, there is probably audio.
 function getPronunciation(doc)
 {
@@ -128,12 +83,12 @@ function getBriefResult(doc)
     return cards;
 }
 
-function createParagraph(id, html)
+function createParagraph(id, element)
 {
     let e = document.createElement('p');
     if (id !== '')
         e.id = id;
-    e.innerHTML = html;
+    e.appendChild(element);
     return e;
 }
 
@@ -160,19 +115,16 @@ function createLink(id, href, text)
 <div id="tip/wait/result" ...>
 <!-- tip, wait or query result -->
 </div>
-<footer ...>...</footer>
+<footer id="footer" ...>...</footer>
 </body>
 */
-function insertBeforeFooter(node)
+function insertBeforeById(id, node)
 {
-    let body = document.getElementById('body');
-    let indexFooter = body.childNodes.length - 2;
-    body.insertBefore(node, body.childNodes[indexFooter]);
+    let e = document.getElementById(id);
+    e.parentNode.insertBefore(node, e);
 }
 
 search.onclick = async function(element) {
-    const waitMsg = '查詢中請稍候...';
-
     // Simple lock to avoid multiple click events at nearly the same time
     if (lock === true)
         return;
@@ -197,7 +149,13 @@ search.onclick = async function(element) {
 
         removeNodeById('tip');
         removeNodeById('result');
-        insertBeforeFooter(createDiv('wait', createParagraph('', waitMsg)));
+        insertBeforeById(
+            'footer',
+            createDiv(
+                'wait',
+                createParagraph('waitMsg', document.createTextNode('查詢中請稍候...'))
+            )
+        );
 
         let query = `https://tw.dictionary.search.yahoo.com/search?p=${toQuery(input.value)}`;
         let result = createDiv('result', null);
@@ -211,26 +169,18 @@ search.onclick = async function(element) {
             for (let i = 0; i < brief.length; i++)
                 result.appendChild(brief[i]);    
 
-            let pronunciation = getPronunciation(result);
-            if (pronunciation !== null)
-            {
-                let audio = createAudio(input.value);
-                if (audio !== null)
-                    pronunciation.appendChild(audio);
-            }
-
             result.appendChild(createLink('explication', query, '詳細釋義'));
             result.appendChild(document.createElement('br'));
             result.appendChild(document.createElement('br'));
         }
         catch (error)
         {
-            result.appendChild(createParagraph('exception', error.message));
+            result.appendChild(createParagraph('exception', document.createTextNode(error.message)));
             break;
         }
 
         removeNodeById('wait');
-        insertBeforeFooter(result);        
+        insertBeforeById('footer', result);
     }
     while(0);
 
